@@ -19,45 +19,68 @@ st.set_page_config(
     page_title="PyLab — The Complete 360° Python Ecosystem",
     page_icon="🐍",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# Custom CSS styling
-st.markdown("""
+# Initialize Session State for Theme Toggle
+if "theme_mode" not in st.session_state:
+    st.session_state["theme_mode"] = "Dark"
+
+# CSS for Dynamic Theme Switching
+if st.session_state["theme_mode"] == "Dark":
+    bg_color = "#0f172a"
+    card_bg = "#1e293b"
+    text_color = "#f8fafc"
+    text_muted = "#94a3b8"
+    border_color = "#334155"
+    input_bg = "#090d16"
+else:
+    bg_color = "#f8fafc"
+    card_bg = "#ffffff"
+    text_color = "#0f172a"
+    text_muted = "#64748b"
+    border_color = "#e2e8f0"
+    input_bg = "#f1f5f9"
+
+st.markdown(f"""
 <style>
-    .brand-title {
+    .stApp {{
+        background-color: {bg_color};
+        color: {text_color};
+    }}
+    .brand-title {{
         font-size: 2.5rem;
         font-weight: 800;
         background: linear-gradient(135deg, #38BDF8 0%, #6366F1 50%, #A855F7 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0px;
-    }
-    .brand-tagline {
+    }}
+    .brand-tagline {{
         font-size: 1.1rem;
         font-weight: 600;
-        color: #94A3B8;
-        margin-bottom: 1.5rem;
-    }
-    .footer-box {
+        color: {text_muted};
+        margin-bottom: 1rem;
+    }}
+    .footer-box {{
         margin-top: 3rem;
         padding-top: 1.2rem;
-        border-top: 1px solid #334155;
+        border-top: 1px solid {border_color};
         text-align: center;
-        color: #94A3B8;
+        color: {text_muted};
         font-size: 0.9rem;
         line-height: 1.6;
-    }
-    .footer-eco {
+    }}
+    .footer-eco {{
         font-weight: 700;
-        color: #F8FAFC;
+        color: {text_color};
         font-size: 1rem;
-    }
-    .footer-hub {
+    }}
+    .footer-hub {{
         font-weight: 600;
-        color: #94A3B8;
+        color: {text_muted};
         font-size: 0.9rem;
-    }
+    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -109,7 +132,29 @@ def get_ai_client(api_key: str, model_name: str, free_mode: bool):
     return client, effective_model, mode_label
 
 
-# --- Sidebar Setup ---
+# --- TOP HEADER WITH THEME TOGGLE BUTTON ---
+col_head, col_theme = st.columns([3, 1])
+
+with col_head:
+    st.markdown('<div class="brand-title">🐍 PyLab</div>', unsafe_allow_html=True)
+    st.markdown('<div class="brand-tagline">Your Intelligent Python Workspace & Code Execution Engine</div>', unsafe_allow_html=True)
+
+with col_theme:
+    selected_theme = st.radio(
+        "🎨 Select Theme Mode:",
+        ["🌙 Dark Mode", "☀️ Light Mode"],
+        index=0 if st.session_state["theme_mode"] == "Dark" else 1,
+        horizontal=True
+    )
+    if "Dark" in selected_theme and st.session_state["theme_mode"] != "Dark":
+        st.session_state["theme_mode"] = "Dark"
+        st.rerun()
+    elif "Light" in selected_theme and st.session_state["theme_mode"] != "Light":
+        st.session_state["theme_mode"] = "Light"
+        st.rerun()
+
+
+# --- SIDEBAR SETTINGS ---
 st.sidebar.title("🐍 PyLab Settings")
 free_mode = st.sidebar.toggle("Use Free AI Cloud Mode", value=True)
 
@@ -131,16 +176,11 @@ if st.sidebar.button("🧹 Clear Chat Memory"):
     st.rerun()
 
 
-# --- Initialize Session State ---
+# --- INITIALIZE SESSION ---
 if "messages" not in st.session_state:
     st.session_state["messages"] = [{"role": "system", "content": system_prompt}]
 
 client, model_name, mode_label = get_ai_client(api_key_input, model_choice, free_mode)
-
-
-# --- HEADER & BRANDING ---
-st.markdown('<div class="brand-title">🐍 PyLab</div>', unsafe_allow_html=True)
-st.markdown('<div class="brand-tagline">Your Intelligent Python Workspace & Code Execution Engine</div>', unsafe_allow_html=True)
 
 
 # --- HOW TO USE ---
@@ -153,11 +193,10 @@ with st.expander("📖 **How to Use PyLab**", expanded=False):
 
 
 # --- MAIN WORKSPACE TABS ---
-tab_chat, tab_runner, tab_debugger, tab_reference = st.tabs([
+tab_chat, tab_runner, tab_debugger = st.tabs([
     "💬 PyLab AI Chat",
     "▶️ Live Code Sandbox",
-    "🐛 Code Debugger",
-    "📚 Python Reference"
+    "🐛 Code Debugger"
 ])
 
 
@@ -236,16 +275,6 @@ with tab_debugger:
             st.markdown(fix_resp.choices[0].message.content)
         except Exception:
             st.markdown("**Root Cause**: `ZeroDivisionError` - cannot divide by 0.\n\n**Fix**:\n```python\nif divisor != 0:\n    print(10 / divisor)\n```")
-
-
-# --- TAB 4: REFERENCE ---
-with tab_reference:
-    st.subheader("📚 Python Core Reference")
-    st.markdown("""
-    * **Lists**: `items = [1, 2, 3]; items.append(4)`
-    * **Dicts**: `data = {"a": 1}; print(data["a"])`
-    * **Loops**: `for x in range(5): print(x)`
-    """)
 
 
 # --- FOOTER SPECIFIED BY USER ---
