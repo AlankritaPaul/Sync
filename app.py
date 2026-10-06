@@ -9,9 +9,11 @@ import sys
 import os
 import io
 import re
+import textwrap
 import contextlib
 import traceback
 import streamlit as st
+import streamlit.components.v1 as components
 from openai import OpenAI
 
 # Set Streamlit Page Config
@@ -26,27 +28,32 @@ st.set_page_config(
 if "theme_mode" not in st.session_state:
     st.session_state["theme_mode"] = "Dark"
 
-# CSS for Dynamic Theme Switching
+# CSS for Dynamic Theme Switching & Animated Background
 if st.session_state["theme_mode"] == "Dark":
-    bg_color = "#0f172a"
-    card_bg = "#1e293b"
+    bg_gradient = "linear-gradient(-45deg, #090d16, #0f172a, #1e1b4b, #0f172a)"
+    card_bg = "rgba(30, 41, 59, 0.75)"
     text_color = "#f8fafc"
     text_muted = "#94a3b8"
-    border_color = "#334155"
-    input_bg = "#090d16"
+    border_color = "rgba(51, 65, 85, 0.7)"
 else:
-    bg_color = "#f8fafc"
-    card_bg = "#ffffff"
+    bg_gradient = "linear-gradient(-45deg, #f1f5f9, #e2e8f0, #cbd5e1, #f1f5f9)"
+    card_bg = "rgba(255, 255, 255, 0.85)"
     text_color = "#0f172a"
     text_muted = "#64748b"
-    border_color = "#e2e8f0"
-    input_bg = "#f1f5f9"
+    border_color = "rgba(203, 213, 225, 0.8)"
 
-st.markdown(f"""
+st.markdown(textwrap.dedent(f"""
 <style>
     .stApp {{
-        background-color: {bg_color};
+        background: {bg_gradient};
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
         color: {text_color};
+    }}
+    @keyframes gradientShift {{
+        0% {{ background-position: 0% 50%; }}
+        50% {{ background-position: 100% 50%; }}
+        100% {{ background-position: 0% 50%; }}
     }}
     .brand-title {{
         font-size: 2.5rem;
@@ -82,7 +89,79 @@ st.markdown(f"""
         font-size: 0.9rem;
     }}
 </style>
-""", unsafe_allow_html=True)
+<canvas id="pylab-bg-canvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;"></canvas>
+"""), unsafe_allow_html=True)
+
+# Step 2: Execute JS via components.html as per global rule
+components.html("""
+<script>
+(function run() {
+    const canvas = window.parent.document.getElementById('pylab-bg-canvas');
+    if (!canvas) { setTimeout(run, 50); return; }
+
+    const ctx = canvas.getContext('2d');
+    let width, height, particles;
+
+    function resize() {
+        width = canvas.width = window.parent.innerWidth;
+        height = canvas.height = window.parent.innerHeight;
+    }
+
+    function createParticles() {
+        particles = [];
+        const numParticles = Math.min(Math.floor(width * height / 15000), 70);
+        for (let i = 0; i < numParticles; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                radius: Math.random() * 2 + 1,
+                alpha: Math.random() * 0.4 + 0.2
+            });
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        for (let i = 0; i < particles.length; i++) {
+            let p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+
+            if (p.x < 0 || p.x > width) p.vx *= -1;
+            if (p.y < 0 || p.y > height) p.vy *= -1;
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(99, 102, 241, ' + p.alpha + ')';
+            ctx.fill();
+
+            for (let j = i + 1; j < particles.length; j++) {
+                let p2 = particles[j];
+                let dx = p.x - p2.x;
+                let dy = p.y - p2.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 110) {
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.strokeStyle = 'rgba(99, 102, 241, ' + (0.12 * (1 - dist / 110)) + ')';
+                    ctx.lineWidth = 0.8;
+                    ctx.stroke();
+                }
+            }
+        }
+        window.parent.requestAnimationFrame(animate);
+    }
+
+    window.parent.addEventListener('resize', () => { resize(); createParticles(); });
+    resize();
+    createParticles();
+    animate();
+})();
+</script>
+""", height=0, scrolling=False)
 
 
 # --- Built-in Instant Python Knowledge Engine ---
@@ -128,7 +207,6 @@ def sanitize_ai_response(text: str) -> str:
     for pat in patterns:
         cleaned = re.sub(pat, "", cleaned, flags=re.DOTALL | re.MULTILINE)
     return cleaned.strip()
-
 
 
 # --- AI Client Setup ---
@@ -260,7 +338,6 @@ with tab_chat:
             st.session_state["messages"].append({"role": "assistant", "content": full_response})
 
 
-
 # --- TAB 2: SANDBOX ---
 with tab_runner:
     st.subheader("▶️ Live Python Execution Sandbox")
@@ -291,7 +368,7 @@ with tab_debugger:
                 model=model_name,
                 messages=[{"role": "user", "content": f"Fix this Python code: ```python\n{broken_code}\n```"}]
             )
-            st.markdown(fix_resp.choices[0].message.content)
+            st.markdown(sanitize_ai_response(fix_resp.choices[0].message.content or ""))
         except Exception:
             st.markdown("**Root Cause**: `ZeroDivisionError` - cannot divide by 0.\n\n**Fix**:\n```python\nif divisor != 0:\n    print(10 / divisor)\n```")
 

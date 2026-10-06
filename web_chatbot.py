@@ -41,45 +41,65 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <style>
         :root {
             --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --card-border: #334155;
+            --card-bg: rgba(30, 41, 59, 0.75);
+            --card-border: rgba(51, 65, 85, 0.7);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --accent-primary: #6366f1;
             --accent-hover: #4f46e5;
             --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #6366f1 50%, #a855f7 100%);
             --user-bubble: #4f46e5;
-            --ai-bubble: #1e293b;
-            --code-bg: #090d16;
-            --input-bg: #0b1329;
+            --ai-bubble: rgba(30, 41, 59, 0.85);
+            --code-bg: rgba(9, 13, 22, 0.85);
+            --input-bg: rgba(11, 19, 41, 0.85);
         }
 
         [data-theme="light"] {
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --card-border: #e2e8f0;
+            --bg-color: #f1f5f9;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(226, 232, 240, 0.8);
             --text-main: #0f172a;
             --text-muted: #64748b;
             --accent-primary: #4f46e5;
             --accent-hover: #4338ca;
             --accent-gradient: linear-gradient(135deg, #0284c7 0%, #4f46e5 50%, #7c3aed 100%);
             --user-bubble: #4f46e5;
-            --ai-bubble: #f1f5f9;
-            --code-bg: #f1f5f9;
+            --ai-bubble: rgba(241, 245, 249, 0.9);
+            --code-bg: rgba(241, 245, 249, 0.9);
             --input-bg: #ffffff;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.25s, color 0.25s; }
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.3s, color 0.3s; }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-color);
+            background: linear-gradient(-45deg, #090d16, #0f172a, #1e1b4b, #0f172a);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 24px 16px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
         }
 
         .container {
@@ -88,6 +108,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             display: flex;
             flex-direction: column;
             gap: 20px;
+            position: relative;
+            z-index: 1;
         }
 
         /* --- HEADER OVERVIEW --- */
@@ -107,14 +129,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             justify-content: center;
             font-size: 28px;
             box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+            animation: pulseGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3); }
+            100% { transform: scale(1.05); box-shadow: 0 12px 28px rgba(168, 85, 247, 0.5); }
         }
 
         .overview-card {
             background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--card-border);
             border-radius: 18px;
             padding: 28px 32px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -170,6 +200,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         /* --- HOW TO USE --- */
         .how-to-use-card {
             background: var(--card-bg);
+            backdrop-filter: blur(16px);
             border: 1px solid var(--card-border);
             border-radius: 16px;
             padding: 20px 24px;
@@ -236,10 +267,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         /* --- MAIN WORKSPACE --- */
         .workspace-card {
             background: var(--card-bg);
+            backdrop-filter: blur(16px);
             border: 1px solid var(--card-border);
             border-radius: 18px;
             overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
         }
 
         .chat-box {
@@ -398,6 +430,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </style>
 </head>
 <body>
+    <!-- ANIMATED PARTICLE CANVAS -->
+    <canvas id="bg-canvas"></canvas>
+
     <div class="container">
 
         <!-- HEADER OVERVIEW & THEME TOGGLE -->
@@ -491,7 +526,73 @@ for i in range(1, 4):
 
     </div>
 
+    <!-- CANVAS ANIMATION SCRIPT -->
     <script>
+        (function initParticleCanvas() {
+            const canvas = document.getElementById('bg-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let width, height, particles;
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+
+            function createParticles() {
+                particles = [];
+                const numParticles = Math.min(Math.floor(width * height / 15000), 75);
+                for (let i = 0; i < numParticles; i++) {
+                    particles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * 0.6,
+                        vy: (Math.random() - 0.5) * 0.6,
+                        radius: Math.random() * 2 + 1,
+                        alpha: Math.random() * 0.5 + 0.2
+                    });
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                for (let i = 0; i < particles.length; i++) {
+                    let p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0 || p.x > width) p.vx *= -1;
+                    if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(99, 102, 241, ${p.alpha})`;
+                    ctx.fill();
+
+                    for (let j = i + 1; j < particles.length; j++) {
+                        let p2 = particles[j];
+                        let dx = p.x - p2.x;
+                        let dy = p.y - p2.y;
+                        let dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 120) {
+                            ctx.beginPath();
+                            ctx.moveTo(p.x, p.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.strokeStyle = `rgba(99, 102, 241, ${0.15 * (1 - dist / 120)})`;
+                            ctx.lineWidth = 0.8;
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+
+            window.addEventListener('resize', () => { resize(); createParticles(); });
+            resize();
+            createParticles();
+            animate();
+        })();
+
         function toggleTheme() {
             const html = document.documentElement;
             const btn = document.getElementById('themeBtn');
