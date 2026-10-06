@@ -1,204 +1,94 @@
-# 🤖 Python AI Terminal Chatbot
+# 🐍 Python AI Developer Assistant & Code Sandbox
 
-A fast, interactive, and responsive terminal chatbot powered by OpenAI's Large Language Models. Built with continuous conversational memory, real-time response streaming, colorized terminal UI, and convenient in-chat commands.
+A fast, interactive, feature-rich Python AI assistant, live code execution sandbox, bug debugger, and interactive cheatsheet application. Powered by OpenAI & Free AI Cloud mode.
+
+Built with **Streamlit** for instant local testing on localhost and 1-click cloud deployment for sharing on **LinkedIn**!
 
 ---
 
 ## ✨ Features
 
-- **No Account Required Out-of-the-Box**: Includes Free AI Cloud mode enabled by default. You can start chatting immediately without creating an OpenAI account or entering a credit card!
-- **Continuous Conversation Loop**: Natural, multi-turn chat experience in your terminal that remembers prior context.
-- **Real-Time Token Streaming**: Watch the AI generate responses live in real time.
-- **Environment Variable Driven**: Seamlessly switch between Free AI Mode and official OpenAI (`gpt-4o-mini`, `gpt-4o`) via `.env` or system environment variables.
-- **Cross-Platform Styled UI**: Clean, color-coded terminal messages with support for Windows, macOS, and Linux.
-- **Interactive In-Chat Commands**:
-  - `/help` - View available commands.
-  - `/clear` or `/reset` - Clear chat memory and start fresh.
-  - `/model <name>` - Switch models on the fly (e.g., `gpt-4o`, `gpt-4o-mini`).
-  - `/system <prompt>` - Dynamically update the AI persona / instructions.
-  - `/history` - View message and turn count.
-  - `exit` or `quit` - Cleanly exit the session.
-- **Robust Error Handling**: Friendly, actionable error messages for network issues and quota limits.
+- **💬 Python AI Chatbot**: Specialized assistant providing clean Python 3 code, explanation, and best practices.
+- **▶️ Live Python Execution Sandbox**: Write or edit Python code live in your browser and execute it safely to view terminal output.
+- **🐛 Python Code & Error Debugger**: Paste broken code or error tracebacks to get instant root cause explanations and fixes.
+- **📚 Interactive Python Cheatsheets**: Quick references for Data Structures, File I/O, Functions, OOP, and libraries (`pandas`, `requests`, `fastapi`).
+- **🌐 Zero Configuration Required**: Built-in **Free AI Cloud Mode** enabled by default (no OpenAI account or credit card required).
+- **🚀 1-Click Streamlit Cloud Deployment**: Ready for instant deployment to Streamlit Community Cloud and showcasing on your LinkedIn profile.
 
 ---
 
-## 📋 Prerequisites
+## 🚀 Quick Start (Localhost)
 
-- **Python 3.8+** installed on your system.
-- *(Optional)* An **OpenAI API Key** if you wish to use official OpenAI models instead of the free tier.
-
----
-
-## 🚀 Quick Start Guide
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/AlankritaPaul/Repository.git
-cd Repository
-```
-
-### 2. Create and Activate a Virtual Environment
-
-It is recommended to use a virtual environment to manage dependencies:
-
-**On Windows (PowerShell):**
-```powershell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-```
-
-**On Windows (Command Prompt):**
-```cmd
-python -m venv venv
-.\venv\Scripts\activate.bat
-```
-
-**On macOS / Linux:**
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3. Install Dependencies
-
-Install the required packages using `pip`:
-
+### 1. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
----
+### 2. Launch the Streamlit App (Localhost)
+Run the following command in your terminal:
 
-## 🔑 Setting Up Your API Key
+```bash
+streamlit run app.py
+```
 
-The chatbot requires an OpenAI API key provided through the `OPENAI_API_KEY` environment variable. You can configure this in one of two ways:
-
-### Option A: Using a `.env` file (Recommended)
-
-1. Copy the provided `.env.example` template to `.env`:
-   ```bash
-   # On Windows (PowerShell or CMD)
-   copy .env.example .env
-
-   # On macOS / Linux
-   cp .env.example .env
-   ```
-
-2. Open `.env` in any text editor and replace the placeholder with your actual OpenAI API key:
-   ```env
-   OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   ```
-
-3. *(Optional)* You can also configure a preferred model or custom system instructions:
-   ```env
-   OPENAI_MODEL=gpt-4o-mini
-   SYSTEM_PROMPT=You are a helpful, friendly, and intelligent AI assistant.
-   ```
-
-> [!CAUTION]
-> **Never commit your `.env` file or hardcode your API key into git!**
-> The `.gitignore` file in this repository is pre-configured to ensure `.env` is never committed.
+Your browser will automatically open at:
+👉 **`http://localhost:8501`**
 
 ---
 
-### Option B: Setting the Environment Variable Directly in Terminal
+## 🖥️ Alternative Local Interfaces
 
-If you prefer not to use a `.env` file, set the environment variable in your terminal session before running the chatbot:
+### Standard Web Interface (Port 5000)
+```bash
+python web_chatbot.py
+```
+Open in browser at: 👉 **`http://localhost:5000`**
 
-- **Windows PowerShell:**
-  ```powershell
-  $env:OPENAI_API_KEY = "sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-  ```
-
-- **Windows Command Prompt (CMD):**
-  ```cmd
-  set OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-  ```
-
-- **macOS / Linux (Bash / Zsh):**
-  ```bash
-  export OPENAI_API_KEY="sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-  ```
-
----
-
-## 💬 Running the Chatbot
-
-Once your environment and API key are configured, start the chatbot with:
-
+### Terminal Interactive Interface
 ```bash
 python chatbot.py
 ```
 
-### Example Usage:
+---
 
-```text
-============================================================
-           🤖 Python AI Terminal Chatbot
-============================================================
- Model: gpt-4o-mini
- Commands: Type /help for commands or exit to quit.
-------------------------------------------------------------
+## 🔑 (Optional) Setting Up OpenAI API Key
 
-You > Hello! Can you explain recursion in one simple sentence?
-AI > Recursion is a programming technique where a function calls itself to solve smaller instances of the same problem until reaching a stopping condition.
+You can switch between **Free AI Cloud Mode** and **Official OpenAI Models** (`gpt-4o-mini`, `gpt-4o`) via the app sidebar or `.env` file:
 
-You > Can you give a tiny Python example?
-AI > def countdown(n):
-    if n <= 0:
-        print("Blast off!")
-    else:
-        print(n)
-        countdown(n - 1)
-
-countdown(3)
-
-You > exit
-
-👋 Goodbye! Have a wonderful day.
-```
+1. Copy `.env.example` to `.env`:
+   ```bash
+   copy .env.example .env
+   ```
+2. Edit `.env` and set your key:
+   ```env
+   OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxx
+   ```
 
 ---
 
-## 🛠️ Interactive In-Chat Commands
+## 🌐 Deploying to Streamlit Cloud & LinkedIn Showcase
 
-While in the chat loop, you can execute the following commands at any prompt:
-
-| Command | Description |
-| :--- | :--- |
-| `/help` | Displays the list of available commands |
-| `/clear` or `/reset` | Clears conversation history to start a brand new topic |
-| `/model <name>` | Switches the OpenAI model in real-time (e.g. `/model gpt-4o`) |
-| `/system <prompt>` | Updates the AI assistant's persona or behavioral instructions |
-| `/history` | Displays current turn count and message history length |
-| `exit` or `quit` | Gracefully closes the chat session |
-
----
-
-## ⚙️ Configuration Reference
-
-| Variable | Default | Description |
-| :--- | :--- | :--- |
-| `OPENAI_API_KEY` | *(Required)* | Your secret API key from OpenAI |
-| `OPENAI_MODEL` | `gpt-4o-mini` | OpenAI model identifier (e.g. `gpt-4o-mini`, `gpt-4o`) |
-| `SYSTEM_PROMPT` | `"You are a helpful, friendly, and intelligent AI assistant."` | Base instructions guiding the AI's behavior |
+1. Push your changes to GitHub:
+   ```bash
+   git add .
+   git commit -m "feat: add streamlit python ai assistant and sandbox"
+   git push origin main
+   ```
+2. Go to **[share.streamlit.io](https://share.streamlit.io)** and log in with GitHub.
+3. Click **New app** -> Select Repository `AlankritaPaul/Sync` -> Main file path: `app.py`.
+4. Click **Deploy!**
+5. Copy your live app URL (e.g., `https://sync-python-ai.streamlit.app`) and feature it on your **LinkedIn Profile**!
 
 ---
 
-## 📁 Repository Structure
+## 🧪 Running Unit Tests
 
-```
-Repository/
-├── .env.example       # Template environment variable file
-├── .gitignore         # Prevents secrets, cache, and virtual environments from tracking
-├── chatbot.py         # Main application script
-├── requirements.txt   # Python package dependencies
-└── README.md          # Complete project guide and documentation
+```bash
+python -m unittest test_chatbot.py
 ```
 
 ---
 
 ## 📄 License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE).

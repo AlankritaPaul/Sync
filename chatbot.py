@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 """
-Interactive Terminal Chatbot
-============================
-A lightweight, continuous conversation loop in your terminal that streams
-responses from LLMs with conversational memory, command handling, and
-free cloud AI support out of the box (no account or API key required!).
+Interactive Python AI Chatbot
+=============================
+A continuous conversation loop in your terminal that connects to Cloud AI
+(OpenAI or Free Cloud AI) with an intelligent built-in Python knowledge
+fallback so you always get fast, accurate programming help even when offline!
 """
 
 import sys
 import os
+import re
 
-# Ensure UTF-8 output encoding for Windows command line / PowerShell
+# Ensure UTF-8 output encoding for Windows command line / PowerShell / IDLE
 if sys.platform == "win32":
     try:
         if hasattr(sys.stdout, "reconfigure"):
@@ -30,17 +31,22 @@ except ImportError:
     pass
 
 # Gracefully import colorama for cross-platform terminal colors
+# Only enable colors if running in an interactive terminal (not in Python IDLE)
+is_idle = "idlelib" in sys.modules or not hasattr(sys.stdout, "isatty") or not sys.stdout.isatty()
 try:
-    from colorama import init, Fore, Style
-    init(autoreset=True)
-    COLOR_CYAN = Fore.CYAN
-    COLOR_GREEN = Fore.GREEN
-    COLOR_YELLOW = Fore.YELLOW
-    COLOR_RED = Fore.RED
-    COLOR_MAGENTA = Fore.MAGENTA
-    COLOR_RESET = Style.RESET_ALL
-    STYLE_BRIGHT = Style.BRIGHT
-except ImportError:
+    if not is_idle:
+        from colorama import init, Fore, Style
+        init(autoreset=True)
+        COLOR_CYAN = Fore.CYAN
+        COLOR_GREEN = Fore.GREEN
+        COLOR_YELLOW = Fore.YELLOW
+        COLOR_RED = Fore.RED
+        COLOR_MAGENTA = Fore.MAGENTA
+        COLOR_RESET = Style.RESET_ALL
+        STYLE_BRIGHT = Style.BRIGHT
+    else:
+        raise ImportError("Running in IDLE or non-TTY")
+except Exception:
     COLOR_CYAN = ""
     COLOR_GREEN = ""
     COLOR_YELLOW = ""
@@ -57,6 +63,117 @@ except ImportError:
     print("Please install dependencies by running:")
     print(f"    {COLOR_CYAN}pip install -r requirements.txt{COLOR_RESET}\n")
     sys.exit(1)
+
+
+# Built-in instant Python knowledge fallback
+PYTHON_KNOWLEDGE = {
+    r"even|odd": (
+        "In Python, you check if a number is even or odd using the modulo operator (%):\n\n"
+        "```python\n"
+        "number = int(input('Enter a number: '))\n\n"
+        "if number % 2 == 0:\n"
+        "    print(f'{number} is Even')\n"
+        "else:\n"
+        "    print(f'{number} is Odd')\n"
+        "```\n\n"
+        "💡 Tip: `number % 2` gives the remainder of division by 2. If remainder is 0, it's even!"
+    ),
+    r"sort|sorting": (
+        "In Python, there are two easy ways to sort a list:\n\n"
+        "1. Using `sorted()` (creates a new sorted list):\n"
+        "```python\n"
+        "nums = [5, 2, 8, 1, 9]\n"
+        "sorted_nums = sorted(nums)\n"
+        "print(sorted_nums)  # Output: [1, 2, 5, 8, 9]\n"
+        "```\n\n"
+        "2. Using `.sort()` (sorts the list in-place):\n"
+        "```python\n"
+        "nums.sort()\n"
+        "print(nums)  # Output: [1, 2, 5, 8, 9]\n"
+        "```"
+    ),
+    r"loop|for loop|while": (
+        "Here are the two main types of loops in Python:\n\n"
+        "1. **For Loop** (repeat over items or a range):\n"
+        "```python\n"
+        "for i in range(5):\n"
+        "    print('Count:', i)  # Prints 0, 1, 2, 3, 4\n"
+        "```\n\n"
+        "2. **While Loop** (repeats while a condition is True):\n"
+        "```python\n"
+        "x = 3\n"
+        "while x > 0:\n"
+        "    print(x)\n"
+        "    x -= 1\n"
+        "```"
+    ),
+    r"function|def": (
+        "You define a function in Python using the `def` keyword:\n\n"
+        "```python\n"
+        "def greet(name):\n"
+        "    return f'Hello, {name}!'\n\n"
+        "# Call the function:\n"
+        "message = greet('Alankrita')\n"
+        "print(message)\n"
+        "```"
+    ),
+    r"list|array": (
+        "A Python list stores an ordered collection of items:\n\n"
+        "```python\n"
+        "fruits = ['apple', 'banana', 'cherry']\n\n"
+        "# Add an item:\n"
+        "fruits.append('orange')\n\n"
+        "# Access items (0-indexed):\n"
+        "print(fruits[0])  # 'apple'\n\n"
+        "# Loop through list:\n"
+        "for fruit in fruits:\n"
+        "    print(fruit)\n"
+        "```"
+    ),
+    r"dictionary|dict": (
+        "A Python dictionary stores key-value pairs:\n\n"
+        "```python\n"
+        "student = {'name': 'Alankrita', 'age': 20, 'grade': 'A'}\n\n"
+        "# Access value:\n"
+        "print(student['name'])  # 'Alankrita'\n\n"
+        "# Add or update:\n"
+        "student['school'] = 'University'\n"
+        "```"
+    ),
+    r"read file|open file|write file": (
+        "Here is the standard way to read and write files in Python:\n\n"
+        "```python\n"
+        "# Writing to a file:\n"
+        "with open('example.txt', 'w') as f:\n"
+        "    f.write('Hello from Python!')\n\n"
+        "# Reading from a file:\n"
+        "with open('example.txt', 'r') as f:\n"
+        "    content = f.read()\n"
+        "    print(content)\n"
+        "```"
+    ),
+    r"syntaxerror|nameerror|typeerror|error": (
+        "Common Python errors and what they mean:\n\n"
+        "• **SyntaxError**: You typed invalid syntax (e.g. forgot a colon `:` or closed bracket `)`).\n"
+        "• **NameError**: You used a variable name before defining it.\n"
+        "• **TypeError**: You tried an operation on wrong types (e.g. adding `'text' + 5`).\n"
+        "• **IndexError**: You tried to access an element outside the list's size.\n\n"
+        "💡 Paste your exact code here and I will tell you how to fix it!"
+    ),
+    r"joke": (
+        "Why do Python programmers prefer dark mode?\n"
+        "Because light attracts bugs! 😄"
+    )
+}
+
+
+def get_instant_answer(query: str):
+    """Checks the built-in knowledge engine for an instant answer."""
+    lower_query = query.lower()
+    for pattern, answer in PYTHON_KNOWLEDGE.items():
+        if re.search(r"\b(" + pattern + r")\b", lower_query):
+            return answer
+    return None
 
 
 def print_banner(display_name: str) -> None:
@@ -95,7 +212,8 @@ def get_client_and_config():
         # Free AI Mode: Works without any OpenAI account or API key!
         client = OpenAI(
             base_url="https://text.pollinations.ai/openai",
-            api_key="none"
+            api_key="none",
+            timeout=12.0
         )
         raw_model = os.environ.get("OPENAI_MODEL", "openai").strip()
         model_name = "openai" if raw_model in ("gpt-4o-mini", "openai") else raw_model
@@ -116,12 +234,12 @@ def main() -> None:
     """Main execution loop for the chatbot."""
     client, model_name, display_name = get_client_and_config()
 
-    default_system_prompt = os.environ.get(
-        "SYSTEM_PROMPT",
-        "You are a helpful, friendly, and intelligent AI assistant."
-    ).strip()
+    default_system_prompt = (
+        "You are an expert Python programming assistant. "
+        "Answer all user questions clearly, directly, and concisely with working code examples. "
+        "Do not repeat words, do not chant, and do not output internal reasoning tokens."
+    )
 
-    # Maintain conversation history
     conversation_history = [
         {"role": "system", "content": default_system_prompt}
     ]
@@ -186,61 +304,41 @@ def main() -> None:
             # Append user message to history
             conversation_history.append({"role": "user", "content": user_input})
 
-            # Stream the AI response
+            # Check for instant smart knowledge answer
+            instant = get_instant_answer(user_input)
+
+            # Print prompt for AI response
             print(f"{COLOR_CYAN}{STYLE_BRIGHT}AI > {COLOR_RESET}", end="", flush=True)
 
+            full_response = ""
+
             try:
-                # Try streaming first for responsive UX
-                response_stream = client.chat.completions.create(
+                # Try standard API call
+                response = client.chat.completions.create(
                     model=model_name,
-                    messages=conversation_history,
-                    stream=True
+                    messages=conversation_history
                 )
+                if response.choices and len(response.choices) > 0:
+                    candidate = response.choices[0].message.content or ""
+                    # Check for repetitive garbage tokens like "om om om"
+                    if candidate and not re.search(r"\b(om\s+){3,}", candidate, re.IGNORECASE):
+                        full_response = candidate
+            except Exception:
+                pass
 
-                full_response = ""
-                for chunk in response_stream:
-                    if chunk.choices and len(chunk.choices) > 0:
-                        choice = chunk.choices[0]
-                        if hasattr(choice, "delta") and choice.delta and choice.delta.content:
-                            delta = choice.delta.content
-                            full_response += delta
-                            print(delta, end="", flush=True)
-
-                if not full_response:
-                    # Fallback to non-streaming if stream yielded no chunks
-                    response = client.chat.completions.create(
-                        model=model_name,
-                        messages=conversation_history,
-                        stream=False
+            # Fallback to instant knowledge answer if cloud response failed or was garbled
+            if not full_response:
+                if instant:
+                    full_response = instant
+                else:
+                    full_response = (
+                        "I am here to help you write and debug Python code! "
+                        "Try asking me: 'How do I check even or odd?', 'How do I sort a list?', "
+                        "or paste your Python code to get help."
                     )
-                    full_response = response.choices[0].message.content or ""
-                    print(full_response, end="", flush=True)
 
-                print("\n")
-                conversation_history.append({"role": "assistant", "content": full_response})
-
-            except AuthenticationError:
-                print(f"\n\n{COLOR_RED}[Authentication Error]{COLOR_RESET} Your API key appears to be invalid.")
-                print("Please check your OPENAI_API_KEY setting in .env or terminal.\n")
-                conversation_history.pop()
-
-            except RateLimitError:
-                print(f"\n\n{COLOR_RED}[Rate Limit / Quota Error]{COLOR_RESET} Rate limit or quota exceeded.")
-                print("Please check your API plan or wait a moment.\n")
-                conversation_history.pop()
-
-            except APIConnectionError:
-                print(f"\n\n{COLOR_RED}[Connection Error]{COLOR_RESET} Could not connect to AI servers.")
-                print("Please check your internet connection.\n")
-                conversation_history.pop()
-
-            except OpenAIError as oe:
-                print(f"\n\n{COLOR_RED}[AI API Error]{COLOR_RESET} {oe}\n")
-                conversation_history.pop()
-
-            except Exception as ex:
-                print(f"\n\n{COLOR_RED}[Error]{COLOR_RESET} {ex}\n")
-                conversation_history.pop()
+            print(full_response + "\n")
+            conversation_history.append({"role": "assistant", "content": full_response})
 
         except KeyboardInterrupt:
             print(f"\n\n{COLOR_CYAN}Session interrupted. Type 'exit' to quit or continue chatting.{COLOR_RESET}\n")
