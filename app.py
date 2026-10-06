@@ -48,10 +48,15 @@ st.markdown("""
         font-size: 0.9rem;
         line-height: 1.6;
     }
+    .footer-eco {
+        font-weight: 700;
+        color: #F8FAFC;
+        font-size: 1rem;
+    }
     .footer-hub {
         font-weight: 600;
-        color: #F8FAFC;
-        font-size: 0.95rem;
+        color: #94A3B8;
+        font-size: 0.9rem;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -135,7 +140,7 @@ client, model_name, mode_label = get_ai_client(api_key_input, model_choice, free
 
 # --- HEADER & BRANDING ---
 st.markdown('<div class="brand-title">🐍 PyLab</div>', unsafe_allow_html=True)
-st.markdown('<div class="brand-tagline">The Complete 360° Python Ecosystem</div>', unsafe_allow_html=True)
+st.markdown('<div class="brand-tagline">Your Intelligent Python Workspace & Code Execution Engine</div>', unsafe_allow_html=True)
 
 
 # --- HOW TO USE ---
@@ -246,6 +251,7 @@ with tab_reference:
 # --- FOOTER SPECIFIED BY USER ---
 st.markdown("""
 <div class="footer-box">
+    <div class="footer-eco">The Complete 360° Python Ecosystem</div>
     <div class="footer-hub">The central hub for Python code and execution</div>
     <div>© All rights reserved.</div>
     <div>Conceived by <b>Alankrita Paul</b></div>

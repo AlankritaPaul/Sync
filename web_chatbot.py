@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-PyLab - The Complete 360° Python Ecosystem
+PyLab — The Complete 360° Python Ecosystem
 ===========================================
 The central hub for Python code and execution.
 Conceived by Alankrita Paul. All rights reserved. ©
@@ -52,7 +52,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             --ai-bubble: #1e293b;
             --code-bg: #090d16;
             --input-bg: #0b1329;
-            --snake-gold: #f59e0b;
         }
 
         [data-theme="light"] {
@@ -68,7 +67,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             --ai-bubble: #f1f5f9;
             --code-bg: #f1f5f9;
             --input-bg: #ffffff;
-            --snake-gold: #d97706;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.25s, color 0.25s; }
@@ -92,7 +90,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             gap: 20px;
         }
 
-        /* --- LOGO BRANDING & HEADER --- */
+        /* --- HEADER OVERVIEW --- */
         .brand-logo-container {
             display: flex;
             align-items: center;
@@ -133,9 +131,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             -webkit-text-fill-color: transparent;
         }
 
-        .app-title-group .tagline {
+        .app-title-group .subtext {
             font-size: 14px;
-            font-weight: 600;
             color: var(--text-muted);
             margin-top: 4px;
         }
@@ -373,7 +370,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         /* --- FOOTER SPECIFIED BY USER --- */
         .footer {
             margin-top: 30px;
-            padding: 20px;
+            padding: 22px;
             text-align: center;
             border-top: 1px solid var(--card-border);
             width: 100%;
@@ -381,13 +378,20 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             color: var(--text-muted);
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
+        }
+
+        .footer .eco-title {
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 15px;
+            letter-spacing: 0.2px;
         }
 
         .footer .hub-line {
             font-weight: 600;
-            color: var(--text-main);
-            font-size: 14px;
+            color: var(--text-muted);
+            font-size: 13px;
         }
 
         .footer strong { color: var(--text-main); }
@@ -402,7 +406,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 <div class="snake-icon-badge">🐍</div>
                 <div class="app-title-group">
                     <h1>PyLab</h1>
-                    <div class="tagline">The Complete 360° Python Ecosystem</div>
+                    <div class="subtext">Your Intelligent Python Workspace & Code Execution Engine</div>
                 </div>
             </div>
             <div class="theme-toggle-box">
@@ -479,6 +483,7 @@ for i in range(1, 4):
 
         <!-- FOOTER SPECIFIED BY USER -->
         <div class="footer">
+            <div class="eco-title">The Complete 360° Python Ecosystem</div>
             <div class="hub-line">The central hub for Python code and execution</div>
             <div>© All rights reserved.</div>
             <div>Conceived by <strong>Alankrita Paul</strong></div>
