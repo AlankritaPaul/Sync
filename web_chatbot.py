@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Python AI Assistant - Web Application
-=====================================
-A zero-dependency local web application running on http://localhost:5000
+PyLab - The Complete 360° Python Ecosystem
+===========================================
+The central hub for Python code and execution.
 Conceived by Alankrita Paul. All rights reserved. ©
 """
 
@@ -25,7 +25,7 @@ conversation_history = [
     {
         "role": "system",
         "content": (
-            "You are an expert Python programming assistant conceived by Alankrita Paul. "
+            "You are PyLab, an expert Python programming assistant conceived by Alankrita Paul. "
             "Answer all Python questions clearly, directly, and concisely with clean Python 3 code examples."
         )
     }
@@ -36,8 +36,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python AI Assistant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <title>PyLab — The Complete 360° Python Ecosystem</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #0f172a;
@@ -47,12 +47,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             --text-muted: #94a3b8;
             --accent-primary: #6366f1;
             --accent-hover: #4f46e5;
-            --accent-gradient: linear-gradient(135deg, #6366f1, #a855f7);
+            --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #6366f1 50%, #a855f7 100%);
             --user-bubble: #4f46e5;
             --ai-bubble: #1e293b;
             --code-bg: #090d16;
             --input-bg: #0b1329;
-            --header-border: #334155;
+            --snake-gold: #f59e0b;
         }
 
         [data-theme="light"] {
@@ -63,12 +63,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             --text-muted: #64748b;
             --accent-primary: #4f46e5;
             --accent-hover: #4338ca;
-            --accent-gradient: linear-gradient(135deg, #4f46e5, #7c3aed);
+            --accent-gradient: linear-gradient(135deg, #0284c7 0%, #4f46e5 50%, #7c3aed 100%);
             --user-bubble: #4f46e5;
             --ai-bubble: #f1f5f9;
             --code-bg: #f1f5f9;
             --input-bg: #ffffff;
-            --header-border: #e2e8f0;
+            --snake-gold: #d97706;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.25s, color 0.25s; }
@@ -92,7 +92,25 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             gap: 20px;
         }
 
-        /* --- SECTION 1: APP OVERVIEW --- */
+        /* --- LOGO BRANDING & HEADER --- */
+        .brand-logo-container {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .snake-icon-badge {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: var(--accent-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
         .overview-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -107,23 +125,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }
 
         .app-title-group h1 {
-            font-size: 26px;
-            font-weight: 700;
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
             background: var(--accent-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
-        .app-title-group p {
+        .app-title-group .tagline {
             font-size: 14px;
+            font-weight: 600;
             color: var(--text-muted);
-            margin-top: 6px;
+            margin-top: 4px;
         }
 
-        /* --- SECTION 2: THEME TOGGLE --- */
+        /* --- THEME TOGGLE --- */
         .theme-toggle-box {
             display: flex;
             align-items: center;
@@ -149,12 +166,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
         }
 
         .toggle-btn:hover { background: var(--accent-hover); }
 
-        /* --- SECTION 3: HOW TO USE --- */
+        /* --- HOW TO USE --- */
         .how-to-use-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -220,7 +236,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* --- SECTION 4: MAIN WORKSPACE --- */
+        /* --- MAIN WORKSPACE --- */
         .workspace-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -354,7 +370,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             white-space: pre-wrap;
         }
 
-        /* --- SECTION 5: FOOTER --- */
+        /* --- FOOTER SPECIFIED BY USER --- */
         .footer {
             margin-top: 30px;
             padding: 20px;
@@ -368,17 +384,26 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             gap: 6px;
         }
 
+        .footer .hub-line {
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 14px;
+        }
+
         .footer strong { color: var(--text-main); }
     </style>
 </head>
 <body>
     <div class="container">
 
-        <!-- SECTION 1: OVERVIEW & SECTION 2: THEME TOGGLE -->
+        <!-- HEADER OVERVIEW & THEME TOGGLE -->
         <div class="overview-card">
-            <div class="app-title-group">
-                <h1>🐍 Python AI Assistant</h1>
-                <p>Your intelligent Python programming, debugging, and code execution platform.</p>
+            <div class="brand-logo-container">
+                <div class="snake-icon-badge">🐍</div>
+                <div class="app-title-group">
+                    <h1>PyLab</h1>
+                    <div class="tagline">The Complete 360° Python Ecosystem</div>
+                </div>
             </div>
             <div class="theme-toggle-box">
                 <span>Theme:</span>
@@ -386,9 +411,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             </div>
         </div>
 
-        <!-- SECTION 3: HOW TO USE -->
+        <!-- HOW TO USE -->
         <div class="how-to-use-card">
-            <h3>📖 How to Use This App</h3>
+            <h3>📖 How to Use PyLab</h3>
             <div class="steps-grid">
                 <div class="step-item">
                     <strong>1. Ask Python Questions</strong>
@@ -407,11 +432,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
         <!-- TABS NAV -->
         <div class="nav-tabs">
-            <button class="tab-btn active" onclick="showTab('chat')">💬 Python AI Chat</button>
+            <button class="tab-btn active" onclick="showTab('chat')">💬 PyLab AI Chat</button>
             <button class="tab-btn" onclick="showTab('sandbox')">▶️ Live Code Sandbox</button>
         </div>
 
-        <!-- SECTION 4: WORKSPACE CONTENT -->
+        <!-- WORKSPACE CONTENT -->
         <div class="workspace-card">
 
             <!-- TAB 1: CHAT -->
@@ -419,7 +444,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 <div class="chat-box" id="chatBox">
                     <div class="msg ai">
                         <div class="avatar">🐍</div>
-                        <div class="bubble">Hello! I am your Python AI Assistant. Ask me any Python question, request code examples, or ask for help fixing bugs!</div>
+                        <div class="bubble">Welcome to PyLab! I am your intelligent Python AI assistant. Ask me any Python question, request code examples, or ask for help fixing bugs!</div>
                     </div>
                 </div>
                 <div class="input-bar">
@@ -434,14 +459,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                     <h3>▶️ Live Python Execution Sandbox</h3>
                     <textarea id="codeEditor"># Write or paste your Python code here
 def greet_user(name):
-    return f"Hello, {name}! Welcome to Python AI Assistant."
+    return f"Welcome to PyLab, {name}!"
 
 result = greet_user("Alankrita")
 print(result)
 
-# Try a loop:
 for i in range(1, 4):
-    print(f"Iteration #{i}")
+    print(f"Executing Python step #{i}")
 </textarea>
                     <button class="run-btn" onclick="runCode()">▶️ Run Python Code</button>
                     <div>
@@ -453,8 +477,9 @@ for i in range(1, 4):
 
         </div>
 
-        <!-- SECTION 5: FOOTER -->
+        <!-- FOOTER SPECIFIED BY USER -->
         <div class="footer">
+            <div class="hub-line">The central hub for Python code and execution</div>
             <div>© All rights reserved.</div>
             <div>Conceived by <strong>Alankrita Paul</strong></div>
         </div>
@@ -589,7 +614,7 @@ class ChatHandler(BaseHTTPRequestHandler):
                     pass
 
                 if not ai_reply:
-                    ai_reply = instant if instant else "I am here to help you write and debug Python code! Ask me anything about Python."
+                    ai_reply = instant if instant else "I am PyLab! How can I help you write or debug your Python code today?"
 
                 conversation_history.append({"role": "assistant", "content": ai_reply})
 

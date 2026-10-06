@@ -1,6 +1,7 @@
 """
-Python AI Developer Assistant & Code Sandbox
-============================================
+PyLab — The Complete 360° Python Ecosystem
+===========================================
+The central hub for Python code and execution.
 Conceived by Alankrita Paul. All rights reserved. ©
 """
 
@@ -15,7 +16,7 @@ from openai import OpenAI
 
 # Set Streamlit Page Config
 st.set_page_config(
-    page_title="Python AI Assistant",
+    page_title="PyLab — The Complete 360° Python Ecosystem",
     page_icon="🐍",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -24,26 +25,33 @@ st.set_page_config(
 # Custom CSS styling
 st.markdown("""
 <style>
-    .main-header {
-        font-size: 2.2rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%);
+    .brand-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #38BDF8 0%, #6366F1 50%, #A855F7 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 0.2rem;
+        margin-bottom: 0px;
     }
-    .sub-header {
-        font-size: 1rem;
+    .brand-tagline {
+        font-size: 1.1rem;
+        font-weight: 600;
         color: #94A3B8;
         margin-bottom: 1.5rem;
     }
     .footer-box {
         margin-top: 3rem;
-        padding-top: 1rem;
+        padding-top: 1.2rem;
         border-top: 1px solid #334155;
         text-align: center;
         color: #94A3B8;
-        font-size: 0.85rem;
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+    .footer-hub {
+        font-weight: 600;
+        color: #F8FAFC;
+        font-size: 0.95rem;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -52,9 +60,9 @@ st.markdown("""
 # --- Built-in Instant Python Knowledge Engine ---
 PYTHON_KNOWLEDGE = {
     r"even|odd": (
-        "In Python, you check if a number is even or odd using the modulo operator (`%`):\n\n"
+        "In Python, check if a number is even or odd using modulo (`%`):\n\n"
         "```python\n"
-        "number = int(input('Enter a number: '))\n\n"
+        "number = int(input('Enter a number: '))\n"
         "if number % 2 == 0:\n"
         "    print(f'{number} is Even')\n"
         "else:\n"
@@ -62,17 +70,10 @@ PYTHON_KNOWLEDGE = {
         "```"
     ),
     r"sort|sorting": (
-        "In Python, there are two easy ways to sort a list:\n\n"
-        "1. **Using `sorted()`** (creates a new sorted list):\n"
+        "Sort lists in Python using `sorted()` or `.sort()`:\n\n"
         "```python\n"
-        "nums = [5, 2, 8, 1, 9]\n"
-        "sorted_nums = sorted(nums)\n"
-        "print(sorted_nums)  # Output: [1, 2, 5, 8, 9]\n"
-        "```\n\n"
-        "2. **Using `.sort()`** (sorts the list in-place):\n"
-        "```python\n"
-        "nums.sort()\n"
-        "print(nums)  # Output: [1, 2, 5, 8, 9]\n"
+        "nums = [5, 2, 8, 1]\n"
+        "print(sorted(nums)) # [1, 2, 5, 8]\n"
         "```"
     )
 }
@@ -104,7 +105,7 @@ def get_ai_client(api_key: str, model_name: str, free_mode: bool):
 
 
 # --- Sidebar Setup ---
-st.sidebar.title("🐍 Python AI Settings")
+st.sidebar.title("🐍 PyLab Settings")
 free_mode = st.sidebar.toggle("Use Free AI Cloud Mode", value=True)
 
 if not free_mode:
@@ -116,7 +117,7 @@ else:
 
 system_prompt = st.sidebar.text_area(
     "System Persona",
-    value="You are an expert Python assistant conceived by Alankrita Paul.",
+    value="You are PyLab, an expert Python assistant conceived by Alankrita Paul.",
     height=100
 )
 
@@ -132,23 +133,23 @@ if "messages" not in st.session_state:
 client, model_name, mode_label = get_ai_client(api_key_input, model_choice, free_mode)
 
 
-# --- SECTION 1: APP OVERVIEW & TITLE ---
-st.markdown('<div class="main-header">🐍 Python AI Assistant</div>', unsafe_allow_html=True)
-st.markdown(f'<div class="sub-header">Your intelligent Python programming, debugging, and code execution platform. (Engine: {mode_label})</div>', unsafe_allow_html=True)
+# --- HEADER & BRANDING ---
+st.markdown('<div class="brand-title">🐍 PyLab</div>', unsafe_allow_html=True)
+st.markdown('<div class="brand-tagline">The Complete 360° Python Ecosystem</div>', unsafe_allow_html=True)
 
 
-# --- SECTION 2 & 3: HOW TO USE ---
-with st.expander("📖 **How to Use This App**", expanded=False):
+# --- HOW TO USE ---
+with st.expander("📖 **How to Use PyLab**", expanded=False):
     st.markdown("""
-    1. **Python AI Chat**: Type any Python question or topic to get instant code explanations.
+    1. **PyLab AI Chat**: Ask any Python question or topic to get instant code explanations.
     2. **Live Code Sandbox**: Write, edit, and execute Python code live right inside your browser.
-    3. **Code Debugger**: Paste broken Python scripts to get instant explanations and working code fixes.
+    3. **Code Debugger**: Paste broken Python scripts to get instant explanations and working fixes.
     """)
 
 
-# --- SECTION 4: MAIN TABS ---
+# --- MAIN WORKSPACE TABS ---
 tab_chat, tab_runner, tab_debugger, tab_reference = st.tabs([
-    "💬 Python AI Chat",
+    "💬 PyLab AI Chat",
     "▶️ Live Code Sandbox",
     "🐛 Code Debugger",
     "📚 Python Reference"
@@ -191,7 +192,7 @@ with tab_chat:
                 pass
 
             if not full_response:
-                full_response = instant_answer if instant_answer else "I am your Python AI assistant! How can I help you write or fix your Python code?"
+                full_response = instant_answer if instant_answer else "Welcome to PyLab! How can I help you write or debug your Python code today?"
 
             message_placeholder.markdown(full_response)
             st.session_state["messages"].append({"role": "assistant", "content": full_response})
@@ -200,7 +201,7 @@ with tab_chat:
 # --- TAB 2: SANDBOX ---
 with tab_runner:
     st.subheader("▶️ Live Python Execution Sandbox")
-    default_code = 'print("Hello from Python AI Assistant!")\nfor i in range(1, 4):\n    print("Step #", i)'
+    default_code = 'print("Welcome to PyLab — The Complete 360° Python Ecosystem!")\nfor i in range(1, 4):\n    print("Step #", i)'
     code_to_run = st.text_area("Python Code Editor", value=default_code, height=200)
 
     if st.button("▶️ Run Python Code", type="primary"):
@@ -242,9 +243,10 @@ with tab_reference:
     """)
 
 
-# --- SECTION 5: FOOTER ---
+# --- FOOTER SPECIFIED BY USER ---
 st.markdown("""
 <div class="footer-box">
+    <div class="footer-hub">The central hub for Python code and execution</div>
     <div>© All rights reserved.</div>
     <div>Conceived by <b>Alankrita Paul</b></div>
 </div>
