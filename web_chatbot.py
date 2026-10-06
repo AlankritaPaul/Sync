@@ -37,7 +37,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PyLab — The Complete 360° Python Ecosystem</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #0f172a;
@@ -430,7 +430,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </style>
 </head>
 <body>
-    <!-- ANIMATED PARTICLE CANVAS -->
+    <!-- PYTHON-THEMED ANIMATED CANVAS -->
     <canvas id="bg-canvas"></canvas>
 
     <div class="container">
@@ -526,60 +526,64 @@ for i in range(1, 4):
 
     </div>
 
-    <!-- CANVAS ANIMATION SCRIPT -->
+    <!-- PYTHON-THEMED CANVAS ANIMATION SCRIPT -->
     <script>
-        (function initParticleCanvas() {
+        (function initPythonCanvas() {
             const canvas = document.getElementById('bg-canvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
-            let width, height, particles;
+            let width, height, tokens;
+
+            const pyTokens = ['🐍', 'def', 'import', 'print()', 'py', 'return', 'list', 'dict', 'if', 'while', 'async', 'lambda', '{ }', 'None', 'True'];
+            const colors = ['rgba(56, 189, 248, ', 'rgba(99, 102, 241, ', 'rgba(168, 85, 247, ', 'rgba(245, 158, 11, '];
 
             function resize() {
                 width = canvas.width = window.innerWidth;
                 height = canvas.height = window.innerHeight;
             }
 
-            function createParticles() {
-                particles = [];
-                const numParticles = Math.min(Math.floor(width * height / 15000), 75);
-                for (let i = 0; i < numParticles; i++) {
-                    particles.push({
+            function createTokens() {
+                tokens = [];
+                const numTokens = Math.min(Math.floor(width * height / 20000), 45);
+                for (let i = 0; i < numTokens; i++) {
+                    tokens.push({
                         x: Math.random() * width,
                         y: Math.random() * height,
-                        vx: (Math.random() - 0.5) * 0.6,
-                        vy: (Math.random() - 0.5) * 0.6,
-                        radius: Math.random() * 2 + 1,
-                        alpha: Math.random() * 0.5 + 0.2
+                        vx: (Math.random() - 0.5) * 0.4,
+                        vy: (Math.random() - 0.5) * 0.4,
+                        text: pyTokens[Math.floor(Math.random() * pyTokens.length)],
+                        fontSize: Math.floor(Math.random() * 8) + 12,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        alpha: Math.random() * 0.35 + 0.15
                     });
                 }
             }
 
             function animate() {
                 ctx.clearRect(0, 0, width, height);
-                for (let i = 0; i < particles.length; i++) {
-                    let p = particles[i];
-                    p.x += p.vx;
-                    p.y += p.vy;
+                for (let i = 0; i < tokens.length; i++) {
+                    let t = tokens[i];
+                    t.x += t.vx;
+                    t.y += t.vy;
 
-                    if (p.x < 0 || p.x > width) p.vx *= -1;
-                    if (p.y < 0 || p.y > height) p.vy *= -1;
+                    if (t.x < 0 || t.x > width) t.vx *= -1;
+                    if (t.y < 0 || t.y > height) t.vy *= -1;
 
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(99, 102, 241, ${p.alpha})`;
-                    ctx.fill();
+                    ctx.font = t.fontSize + 'px "Fira Code", monospace';
+                    ctx.fillStyle = t.color + t.alpha + ')';
+                    ctx.fillText(t.text, t.x, t.y);
 
-                    for (let j = i + 1; j < particles.length; j++) {
-                        let p2 = particles[j];
-                        let dx = p.x - p2.x;
-                        let dy = p.y - p2.y;
+                    for (let j = i + 1; j < tokens.length; j++) {
+                        let t2 = tokens[j];
+                        let dx = t.x - t2.x;
+                        let dy = t.y - t2.y;
                         let dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 120) {
+                        if (dist < 130) {
                             ctx.beginPath();
-                            ctx.moveTo(p.x, p.y);
-                            ctx.lineTo(p2.x, p2.y);
-                            ctx.strokeStyle = `rgba(99, 102, 241, ${0.15 * (1 - dist / 120)})`;
-                            ctx.lineWidth = 0.8;
+                            ctx.moveTo(t.x, t.y);
+                            ctx.lineTo(t2.x, t2.y);
+                            ctx.strokeStyle = t.color + (0.1 * (1 - dist / 130)) + ')';
+                            ctx.lineWidth = 0.6;
                             ctx.stroke();
                         }
                     }
@@ -587,9 +591,9 @@ for i in range(1, 4):
                 requestAnimationFrame(animate);
             }
 
-            window.addEventListener('resize', () => { resize(); createParticles(); });
+            window.addEventListener('resize', () => { resize(); createTokens(); });
             resize();
-            createParticles();
+            createTokens();
             animate();
         })();
 
