@@ -114,6 +114,23 @@ def get_instant_answer(query: str):
     return None
 
 
+def sanitize_ai_response(text: str) -> str:
+    """Removes any third-party ad headers/footers or promo messages."""
+    if not text:
+        return ""
+    patterns = [
+        r"(?i)\n*Support Pollinations\.AI:.*",
+        r"(?i)\n*🌸\s*Ad\s*🌸.*",
+        r"(?i)\n*Powered by Pollinations\.AI.*",
+        r"(?i)\n*Support our mission to keep AI accessible.*"
+    ]
+    cleaned = text
+    for pat in patterns:
+        cleaned = re.sub(pat, "", cleaned, flags=re.DOTALL | re.MULTILINE)
+    return cleaned.strip()
+
+
+
 # --- AI Client Setup ---
 def get_ai_client(api_key: str, model_name: str, free_mode: bool):
     if free_mode or not api_key:
@@ -238,8 +255,10 @@ with tab_chat:
             if not full_response:
                 full_response = instant_answer if instant_answer else "Welcome to PyLab! How can I help you write or debug your Python code today?"
 
+            full_response = sanitize_ai_response(full_response)
             message_placeholder.markdown(full_response)
             st.session_state["messages"].append({"role": "assistant", "content": full_response})
+
 
 
 # --- TAB 2: SANDBOX ---

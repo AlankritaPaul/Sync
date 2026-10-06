@@ -17,7 +17,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 
 # Add current directory to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from chatbot import get_client_and_config, PYTHON_KNOWLEDGE, get_instant_answer
+from chatbot import get_client_and_config, PYTHON_KNOWLEDGE, get_instant_answer, sanitize_ai_response
 
 PORT = 5000
 client, model_name, display_name = get_client_and_config()
@@ -613,6 +613,7 @@ class ChatHandler(BaseHTTPRequestHandler):
                     )
                     if response.choices and len(response.choices) > 0:
                         candidate = response.choices[0].message.content or ""
+                        candidate = sanitize_ai_response(candidate)
                         if candidate and not re.search(r"\b(om\s+){3,}", candidate, re.IGNORECASE):
                             ai_reply = candidate
                 except Exception:
@@ -621,6 +622,7 @@ class ChatHandler(BaseHTTPRequestHandler):
                 if not ai_reply:
                     ai_reply = instant if instant else "I am PyLab! How can I help you write or debug your Python code today?"
 
+                ai_reply = sanitize_ai_response(ai_reply)
                 conversation_history.append({"role": "assistant", "content": ai_reply})
 
                 self.send_response(200)

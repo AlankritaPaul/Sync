@@ -176,6 +176,23 @@ def get_instant_answer(query: str):
     return None
 
 
+def sanitize_ai_response(text: str) -> str:
+    """Removes any third-party ad headers/footers or promo messages."""
+    if not text:
+        return ""
+    patterns = [
+        r"(?i)\n*Support Pollinations\.AI:.*",
+        r"(?i)\n*🌸\s*Ad\s*🌸.*",
+        r"(?i)\n*Powered by Pollinations\.AI.*",
+        r"(?i)\n*Support our mission to keep AI accessible.*"
+    ]
+    cleaned = text
+    for pat in patterns:
+        cleaned = re.sub(pat, "", cleaned, flags=re.DOTALL | re.MULTILINE)
+    return cleaned.strip()
+
+
+
 def print_banner(display_name: str) -> None:
     """Displays the welcome banner and quick commands."""
     divider = "=" * 60
@@ -337,6 +354,7 @@ def main() -> None:
                         "or paste your Python code to get help."
                     )
 
+            full_response = sanitize_ai_response(full_response)
             print(full_response + "\n")
             conversation_history.append({"role": "assistant", "content": full_response})
 
