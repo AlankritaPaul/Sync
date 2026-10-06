@@ -28,37 +28,30 @@ st.set_page_config(
 if "theme_mode" not in st.session_state:
     st.session_state["theme_mode"] = "Dark"
 
-# CSS for Dynamic Theme Switching & Animated Background
+# Theme Colors: White for Light mode, Deep Blue for Dark mode
 if st.session_state["theme_mode"] == "Dark":
-    bg_gradient = "linear-gradient(-45deg, #090d16, #0f172a, #1e1b4b, #0f172a)"
-    card_bg = "rgba(30, 41, 59, 0.75)"
+    bg_color = "#0b1329"
+    card_bg = "rgba(15, 23, 42, 0.85)"
     text_color = "#f8fafc"
-    text_muted = "#94a3b8"
-    border_color = "rgba(51, 65, 85, 0.7)"
+    text_muted = "#93c5fd"
+    border_color = "rgba(59, 130, 246, 0.35)"
 else:
-    bg_gradient = "linear-gradient(-45deg, #f1f5f9, #e2e8f0, #cbd5e1, #f1f5f9)"
-    card_bg = "rgba(255, 255, 255, 0.85)"
+    bg_color = "#ffffff"
+    card_bg = "rgba(255, 255, 255, 0.95)"
     text_color = "#0f172a"
-    text_muted = "#64748b"
-    border_color = "rgba(203, 213, 225, 0.8)"
+    text_muted = "#475569"
+    border_color = "#e2e8f0"
 
 st.markdown(textwrap.dedent(f"""
 <style>
     .stApp {{
-        background: {bg_gradient};
-        background-size: 400% 400%;
-        animation: gradientShift 15s ease infinite;
+        background-color: {bg_color};
         color: {text_color};
-    }}
-    @keyframes gradientShift {{
-        0% {{ background-position: 0% 50%; }}
-        50% {{ background-position: 100% 50%; }}
-        100% {{ background-position: 0% 50%; }}
     }}
     .brand-title {{
         font-size: 2.5rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #38BDF8 0%, #6366F1 50%, #A855F7 100%);
+        background: linear-gradient(135deg, #38BDF8 0%, #2563EB 50%, #1D4ED8 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0px;
@@ -102,8 +95,8 @@ components.html("""
     const ctx = canvas.getContext('2d');
     let width, height, tokens;
 
-    const pyTokens = ['🐍', 'def', 'import', 'print()', 'py', 'return', 'list', 'dict', 'if', 'while', 'async', 'lambda', '{ }', 'None', 'True'];
-    const colors = ['rgba(56, 189, 248, ', 'rgba(99, 102, 241, ', 'rgba(168, 85, 247, ', 'rgba(245, 158, 11, '];
+    const pyTokens = ['🐍', 'def', 'import', 'print()', 'py', 'return', 'list', 'dict', 'if', 'while', 'async', 'lambda', '{ }', 'None', 'True', 'class', 'yield', 'with', 'pass', 'try', 'except'];
+    const colors = ['rgba(56, 189, 248, ', 'rgba(59, 130, 246, ', 'rgba(99, 102, 241, ', 'rgba(168, 85, 247, '];
 
     function resize() {
         width = canvas.width = window.parent.innerWidth;
@@ -112,17 +105,17 @@ components.html("""
 
     function createTokens() {
         tokens = [];
-        const numTokens = Math.min(Math.floor(width * height / 20000), 45);
+        const numTokens = Math.min(Math.floor(width * height / 10000), 100);
         for (let i = 0; i < numTokens; i++) {
             tokens.push({
                 x: Math.random() * width,
                 y: Math.random() * height,
-                vx: (Math.random() - 0.5) * 0.4,
-                vy: (Math.random() - 0.5) * 0.4,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
                 text: pyTokens[Math.floor(Math.random() * pyTokens.length)],
-                fontSize: Math.floor(Math.random() * 8) + 12,
+                fontSize: Math.floor(Math.random() * 10) + 12,
                 color: colors[Math.floor(Math.random() * colors.length)],
-                alpha: Math.random() * 0.35 + 0.15
+                alpha: Math.random() * 0.4 + 0.25
             });
         }
     }
@@ -146,12 +139,12 @@ components.html("""
                 let dx = t.x - t2.x;
                 let dy = t.y - t2.y;
                 let dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 130) {
+                if (dist < 115) {
                     ctx.beginPath();
                     ctx.moveTo(t.x, t.y);
                     ctx.lineTo(t2.x, t2.y);
-                    ctx.strokeStyle = t.color + (0.1 * (1 - dist / 130)) + ')';
-                    ctx.lineWidth = 0.6;
+                    ctx.strokeStyle = t.color + (0.12 * (1 - dist / 115)) + ')';
+                    ctx.lineWidth = 0.7;
                     ctx.stroke();
                 }
             }

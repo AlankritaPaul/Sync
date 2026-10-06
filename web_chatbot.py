@@ -40,32 +40,34 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.75);
-            --card-border: rgba(51, 65, 85, 0.7);
+            /* DARK MODE: Deep Midnight Blue Background & Blue Accents */
+            --bg-color: #0b1329;
+            --card-bg: rgba(15, 23, 42, 0.85);
+            --card-border: rgba(59, 130, 246, 0.35);
             --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-primary: #6366f1;
-            --accent-hover: #4f46e5;
-            --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #6366f1 50%, #a855f7 100%);
-            --user-bubble: #4f46e5;
-            --ai-bubble: rgba(30, 41, 59, 0.85);
-            --code-bg: rgba(9, 13, 22, 0.85);
-            --input-bg: rgba(11, 19, 41, 0.85);
+            --text-muted: #93c5fd;
+            --accent-primary: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #2563eb 50%, #1d4ed8 100%);
+            --user-bubble: #2563eb;
+            --ai-bubble: rgba(15, 23, 42, 0.9);
+            --code-bg: rgba(3, 7, 18, 0.9);
+            --input-bg: rgba(15, 23, 42, 0.9);
         }
 
         [data-theme="light"] {
-            --bg-color: #f1f5f9;
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --card-border: rgba(226, 232, 240, 0.8);
+            /* LIGHT MODE: Crisp Pure White Background */
+            --bg-color: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --card-border: #e2e8f0;
             --text-main: #0f172a;
-            --text-muted: #64748b;
-            --accent-primary: #4f46e5;
-            --accent-hover: #4338ca;
-            --accent-gradient: linear-gradient(135deg, #0284c7 0%, #4f46e5 50%, #7c3aed 100%);
-            --user-bubble: #4f46e5;
-            --ai-bubble: rgba(241, 245, 249, 0.9);
-            --code-bg: rgba(241, 245, 249, 0.9);
+            --text-muted: #475569;
+            --accent-primary: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-gradient: linear-gradient(135deg, #0284c7 0%, #2563eb 50%, #1d4ed8 100%);
+            --user-bubble: #2563eb;
+            --ai-bubble: #f8fafc;
+            --code-bg: #f1f5f9;
             --input-bg: #ffffff;
         }
 
@@ -73,9 +75,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(-45deg, #090d16, #0f172a, #1e1b4b, #0f172a);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            background-color: var(--bg-color);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
@@ -84,12 +84,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             padding: 24px 16px;
             position: relative;
             overflow-x: hidden;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
         }
 
         #bg-canvas {
@@ -128,13 +122,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             align-items: center;
             justify-content: center;
             font-size: 28px;
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.35);
             animation: pulseGlow 3s ease-in-out infinite alternate;
         }
 
         @keyframes pulseGlow {
-            0% { transform: scale(1); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3); }
-            100% { transform: scale(1.05); box-shadow: 0 12px 28px rgba(168, 85, 247, 0.5); }
+            0% { transform: scale(1); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.35); }
+            100% { transform: scale(1.05); box-shadow: 0 12px 28px rgba(56, 189, 248, 0.55); }
         }
 
         .overview-card {
@@ -144,7 +138,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             border: 1px solid var(--card-border);
             border-radius: 18px;
             padding: 28px 32px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -271,7 +265,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             border: 1px solid var(--card-border);
             border-radius: 18px;
             overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
         }
 
         .chat-box {
@@ -430,7 +424,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </style>
 </head>
 <body>
-    <!-- PYTHON-THEMED ANIMATED CANVAS -->
+    <!-- HIGH-DENSITY PYTHON FLOATING CANVAS -->
     <canvas id="bg-canvas"></canvas>
 
     <div class="container">
@@ -526,16 +520,16 @@ for i in range(1, 4):
 
     </div>
 
-    <!-- PYTHON-THEMED CANVAS ANIMATION SCRIPT -->
+    <!-- HIGH-DENSITY PYTHON FLOATING ANIMATION SCRIPT -->
     <script>
-        (function initPythonCanvas() {
+        (function initHighDensityPythonCanvas() {
             const canvas = document.getElementById('bg-canvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             let width, height, tokens;
 
-            const pyTokens = ['🐍', 'def', 'import', 'print()', 'py', 'return', 'list', 'dict', 'if', 'while', 'async', 'lambda', '{ }', 'None', 'True'];
-            const colors = ['rgba(56, 189, 248, ', 'rgba(99, 102, 241, ', 'rgba(168, 85, 247, ', 'rgba(245, 158, 11, '];
+            const pyTokens = ['🐍', 'def', 'import', 'print()', 'py', 'return', 'list', 'dict', 'if', 'while', 'async', 'lambda', '{ }', 'None', 'True', 'class', 'yield', 'with', 'pass', 'try', 'except'];
+            const colors = ['rgba(56, 189, 248, ', 'rgba(59, 130, 246, ', 'rgba(99, 102, 241, ', 'rgba(168, 85, 247, '];
 
             function resize() {
                 width = canvas.width = window.innerWidth;
@@ -544,17 +538,18 @@ for i in range(1, 4):
 
             function createTokens() {
                 tokens = [];
-                const numTokens = Math.min(Math.floor(width * height / 20000), 45);
+                // High density floating token count (90+ tokens)
+                const numTokens = Math.min(Math.floor(width * height / 10000), 100);
                 for (let i = 0; i < numTokens; i++) {
                     tokens.push({
                         x: Math.random() * width,
                         y: Math.random() * height,
-                        vx: (Math.random() - 0.5) * 0.4,
-                        vy: (Math.random() - 0.5) * 0.4,
+                        vx: (Math.random() - 0.5) * 0.5,
+                        vy: (Math.random() - 0.5) * 0.5,
                         text: pyTokens[Math.floor(Math.random() * pyTokens.length)],
-                        fontSize: Math.floor(Math.random() * 8) + 12,
+                        fontSize: Math.floor(Math.random() * 10) + 12,
                         color: colors[Math.floor(Math.random() * colors.length)],
-                        alpha: Math.random() * 0.35 + 0.15
+                        alpha: Math.random() * 0.4 + 0.25
                     });
                 }
             }
@@ -578,12 +573,12 @@ for i in range(1, 4):
                         let dx = t.x - t2.x;
                         let dy = t.y - t2.y;
                         let dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 130) {
+                        if (dist < 115) {
                             ctx.beginPath();
                             ctx.moveTo(t.x, t.y);
                             ctx.lineTo(t2.x, t2.y);
-                            ctx.strokeStyle = t.color + (0.1 * (1 - dist / 130)) + ')';
-                            ctx.lineWidth = 0.6;
+                            ctx.strokeStyle = t.color + (0.12 * (1 - dist / 115)) + ')';
+                            ctx.lineWidth = 0.7;
                             ctx.stroke();
                         }
                     }
